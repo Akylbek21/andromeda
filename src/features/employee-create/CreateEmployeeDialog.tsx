@@ -61,9 +61,33 @@ export function CreateEmployeeDialog({ open, onClose }: CreateEmployeeDialogProp
   }
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Добавить сотрудника</DialogTitle>
-      <DialogContent sx={{ pt: 3, display: 'flex', flexDirection: 'column', gap: 2 }}>
+    <Dialog 
+      open={open} 
+      onClose={handleClose} 
+      maxWidth="sm" 
+      fullWidth
+      PaperProps={{
+        sx: {
+          borderRadius: 2,
+          border: '1px solid #E2E8F0',
+          boxShadow: '0 10px 40px rgba(245, 66, 100, 0.15)',
+        },
+      }}
+    >
+      <DialogTitle 
+        sx={{ 
+          fontWeight: 700, 
+          fontSize: '1.75rem',
+          pb: 2,
+          background: 'linear-gradient(135deg, #F54264 0%, #F96741 45%, #FC8C1E 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text',
+        }}
+      >
+        Добавить сотрудника
+      </DialogTitle>
+      <DialogContent sx={{ pt: 3, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
         <Controller
           name="firstName"
           control={control}
@@ -141,14 +165,42 @@ export function CreateEmployeeDialog({ open, onClose }: CreateEmployeeDialogProp
         />
       </DialogContent>
 
-      <DialogActions sx={{ p: 2 }}>
-        <Button onClick={handleClose} disabled={isSubmitting}>
+      <DialogActions sx={{ p: 3, pt: 2, gap: 2 }}>
+        <Button 
+          onClick={handleClose} 
+          disabled={isSubmitting}
+          variant="outlined"
+          sx={{ 
+            px: 4,
+            py: 1.5,
+            borderRadius: '8px',
+            borderWidth: '1px',
+            borderColor: '#E2E8F0',
+            '&:hover': {
+              borderWidth: '1px',
+            },
+          }}
+        >
           Отмена
         </Button>
         <Button
           onClick={handleSubmit(onSubmit)}
           variant="contained"
           disabled={isSubmitting}
+          sx={{ 
+            px: 4,
+            py: 1.5,
+            borderRadius: '8px',
+            background: 'linear-gradient(135deg, #F54264 0%, #F96741 45%, #FC8C1E 100%)',
+            boxShadow: '0 4px 12px rgba(245, 66, 100, 0.3)',
+            '&:hover': {
+              background: 'linear-gradient(135deg, #E03252 0%, #E85830 45%, #E67A17 100%)',
+              boxShadow: '0 8px 20px rgba(245, 66, 100, 0.4)',
+            },
+            '&:disabled': {
+              background: 'linear-gradient(135deg, #CBD5E1 0%, #94A3B8 100%)',
+            },
+          }}
         >
           {isSubmitting ? 'Добавление...' : 'Добавить'}
         </Button>

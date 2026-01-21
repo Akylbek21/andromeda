@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Box,
   Drawer,
@@ -8,9 +8,7 @@ import {
   ListItemIcon,
   ListItemText,
   Button,
-  Avatar,
   Divider,
-  Typography,
 } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 import PeopleIcon from '@mui/icons-material/People';
@@ -30,11 +28,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   activeItem,
   onMenuClick,
 }) => {
-  const [user] = useState({
-    name: 'Пользователь',
-    id: '',
-    avatar: 'П',
-  });
 
   return (
     <Drawer

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Outlet, useNavigate } from 'react-router-dom'
+import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import {
   AppBar,
   Box,
@@ -14,44 +14,120 @@ import {
   Toolbar,
   useMediaQuery,
   useTheme,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button,
 } from '@mui/material'
-import { Menu as MenuIcon, People as PeopleIcon } from '@mui/icons-material'
+import {
+  Menu as MenuIcon,
+  People as PeopleIcon,
+  Logout as LogoutIcon,
+  EventNote as EventNoteIcon,
+  ListAlt as ListAltIcon,
+  Settings as SettingsIcon,
+} from '@mui/icons-material'
 import logo from '../../assets/yadro.png'
+import { useAuthStore } from '../../entities/auth'
 
-const DRAWER_WIDTH = 240
-const APPBAR_HEIGHT = 64 // компактная шапка как в Newton
-const LOGO_HEIGHT = 40    // небольшой логотип
+const DRAWER_WIDTH = 280
+const APPBAR_HEIGHT = 72
 
 export function AppLayout() {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [settingsOpen, setSettingsOpen] = useState(false)
   const navigate = useNavigate()
+  const location = useLocation()
+  const user = useAuthStore((state) => state.user)
 
   const handleDrawerToggle = () => setMobileOpen((v) => !v)
 
-  const menuItems = [{ label: 'Сотрудники', icon: <PeopleIcon />, path: '/employees' }]
+  const menuItems = [
+    { label: 'Сотрудники', icon: <PeopleIcon />, path: '/employees' },
+    { label: 'Мои сессии', icon: <EventNoteIcon />, path: '/my-sessions' },
+    { label: 'Все сессии', icon: <ListAltIcon />, path: '/sessions' },
+  ]
 
   const drawer = (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      {/* Логотип в сайдбаре */}
-      <Box sx={{ p: 2, display: 'flex', alignItems: 'center', minHeight: APPBAR_HEIGHT }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', pt: 3 }}>
+      {/* Логотип */}
+      <Box sx={{ px: 3, pb: 4, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <Box
           component="img"
           src={logo}
-          alt="Yadro by Andromeda"
+          alt="Andromeda"
           onClick={() => navigate('/employees')}
           sx={{
-            height: 56,
-            width: 'auto',
+            width: '100%',
+            maxWidth: 220,
+            height: 'auto',
             objectFit: 'contain',
             cursor: 'pointer',
+            transition: 'transform 0.3s, opacity 0.2s',
+            '&:hover': {
+              transform: 'scale(1.08)',
+              opacity: 0.9,
+            },
           }}
         />
       </Box>
 
+      {/* Диалог настроек (данные о пользователе) */}
+      <Dialog open={settingsOpen} onClose={() => setSettingsOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Мои данные</DialogTitle>
+        <DialogContent dividers>
+          <DialogContentText sx={{ mb: 2 }}>
+            Просмотр информации вашего профиля.
+          </DialogContentText>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Box sx={{ color: 'text.secondary' }}>ID</Box>
+              <Box>{user?.userId ?? '—'}</Box>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Box sx={{ color: 'text.secondary' }}>Фамилия</Box>
+              <Box>{user?.lastName ?? '—'}</Box>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Box sx={{ color: 'text.secondary' }}>Имя</Box>
+              <Box>{user?.firstName ?? '—'}</Box>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Box sx={{ color: 'text.secondary' }}>Email</Box>
+              <Box>{user?.email ?? '—'}</Box>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Box sx={{ color: 'text.secondary' }}>Телефон</Box>
+              <Box>{user?.phoneNumber ?? '—'}</Box>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Box sx={{ color: 'text.secondary' }}>Роли</Box>
+              <Box>{user?.roles?.join(', ') ?? '—'}</Box>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Box sx={{ color: 'text.secondary' }}>Доступ</Box>
+              <Box>
+                {user?.sections
+                  ? Object.entries(user.sections)
+                      .filter(([, val]) => val)
+                      .map(([key]) => key)
+                      .join(', ') || '—'
+                  : '—'}
+              </Box>
+            </Box>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setSettingsOpen(false)}>Закрыть</Button>
+        </DialogActions>
+      </Dialog>
+
       {/* Меню */}
-      <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
+      <Box sx={{ flexGrow: 1, overflow: 'auto', px: 1 }}>
         <List>
           {menuItems.map((item) => (
             <ListItem key={item.label} disablePadding>
@@ -60,13 +136,65 @@ export function AppLayout() {
                   navigate(item.path)
                   if (isMobile) setMobileOpen(false)
                 }}
+                selected={location.pathname === item.path}
               >
-                <ListItemIcon>{item.icon}</ListItemIcon>
-                <ListItemText primary={item.label} />
+                <ListItemIcon sx={{ minWidth: 40 }}>{item.icon}</ListItemIcon>
+                <ListItemText 
+                  primary={item.label}
+                  primaryTypographyProps={{
+                    fontSize: '0.9375rem',
+                    fontWeight: 500,
+                  }}
+                />
               </ListItemButton>
             </ListItem>
           ))}
         </List>
+      </Box>
+
+      {/* Настройки и выход */}
+      <Box sx={{ p: 2, borderTop: '1px solid', borderColor: 'divider', display: 'flex', gap: 1 }}>
+        <IconButton
+          onClick={() => setSettingsOpen(true)}
+          sx={{
+            borderRadius: '12px',
+            color: 'text.primary',
+            backgroundColor: 'rgba(102, 126, 234, 0.08)',
+            '&:hover': {
+              backgroundColor: 'rgba(102, 126, 234, 0.16)',
+            },
+          }}
+          aria-label="Мои данные"
+        >
+          <SettingsIcon />
+        </IconButton>
+
+        <ListItemButton
+          onClick={() => {
+            localStorage.clear()
+            navigate('/login')
+            if (isMobile) setMobileOpen(false)
+          }}
+          sx={{
+            borderRadius: '12px',
+            color: 'error.main',
+            flex: 1,
+            '&:hover': {
+              backgroundColor: 'rgba(239, 68, 68, 0.08)',
+            },
+          }}
+        >
+          <ListItemIcon sx={{ color: 'error.main', minWidth: 40 }}>
+            <LogoutIcon />
+          </ListItemIcon>
+          <ListItemText
+            primary="Выйти"
+            primaryTypographyProps={{
+              fontSize: '0.9375rem',
+              fontWeight: 600,
+            }}
+          />
+        </ListItemButton>
       </Box>
     </Box>
   )
@@ -75,11 +203,23 @@ export function AppLayout() {
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
 
-      <AppBar position="fixed" sx={{ zIndex: (t) => t.zIndex.drawer + 1, left: { md: DRAWER_WIDTH } }}>
+      <AppBar 
+        position="fixed" 
+        sx={{ 
+          zIndex: (t) => t.zIndex.drawer + 1, 
+          left: { md: DRAWER_WIDTH },
+          backgroundColor: 'rgba(255, 255, 255, 0.8)',
+          backdropFilter: 'blur(12px)',
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+        }}
+      >
         <Toolbar
           sx={{
             minHeight: APPBAR_HEIGHT,
-            px: 2,
+            px: 3,
+            display: 'flex',
+            alignItems: 'center',
           }}
         >
           {isMobile && (

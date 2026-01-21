@@ -1,23 +1,30 @@
 import { Navigate, createBrowserRouter } from 'react-router-dom'
-import { EmployeesPage } from '../pages/employees/EmployeesPage'
+import EmployeesPage from '../pages/employees/EmployeesPage'
+import { MySessionsPage } from '../pages/MySessionsPage'
+import { AllSessionsPage } from '../pages/AllSessionsPage'
+import { LoginPage, CodePage } from '../features/auth-login'
+import { ProtectedRoute } from './routes/ProtectedRoute'
 import { AppLayout } from './layout/AppLayout'
 
-function LoginPage() {
-  return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-      <div>Страница входа (заглушка)</div>
-    </div>
-  )
-}
-
 export const router = createBrowserRouter([
+  // Публичные маршруты авторизации
   {
     path: '/login',
     element: <LoginPage />,
   },
   {
+    path: '/login/code',
+    element: <CodePage />,
+  },
+  
+  // Защищенные маршруты
+  {
     path: '/',
-    element: <AppLayout />,
+    element: (
+      <ProtectedRoute>
+        <AppLayout />
+      </ProtectedRoute>
+    ),
     children: [
       {
         path: '/',
@@ -27,6 +34,20 @@ export const router = createBrowserRouter([
         path: '/employees',
         element: <EmployeesPage />,
       },
+      {
+        path: '/my-sessions',
+        element: <MySessionsPage />,
+      },
+      {
+        path: '/sessions',
+        element: <AllSessionsPage />,
+      },
     ],
+  },
+  
+  // Редирект всех неизвестных путей на /login
+  {
+    path: '*',
+    element: <Navigate to="/login" replace />,
   },
 ])

@@ -32,10 +32,19 @@ const processQueue = (error: AxiosError | null, token: string | null = null) => 
 // Request interceptor: add Authorization header if token exists
 http.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token = getAccessToken()
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+    // Не добавляем токен для публичных auth эндпоинтов
+    const url = config.url || ''
+    const isAuthEndpoint = url.includes('/auth/send-code') || 
+                          url.includes('/auth/login') || 
+                          url.includes('/auth/refresh')
+    
+    if (!isAuthEndpoint) {
+      const token = getAccessToken()
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`
+      }
     }
+    
     return config
   },
   (error) => Promise.reject(error)

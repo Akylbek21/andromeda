@@ -1,22 +1,23 @@
 import { create } from 'zustand'
 import type { Employee } from './index'
-import { getEmployees } from './index'
+import { getEmployees, searchEmployees } from './index'
 
 export interface EmployeeStoreState {
   items: Employee[]
   total: number
   loading: boolean
   error?: string
-  page: number
-  size: number
   q: string
+  roleFilter: string
+  statusFilter: string
 }
 
 export interface EmployeeStoreActions {
-  setPage: (page: number) => void
-  setSize: (size: number) => void
   setQuery: (q: string) => void
+  setRoleFilter: (role: string) => void
+  setStatusFilter: (status: string) => void
   fetchEmployees: () => Promise<void>
+  refetch: () => Promise<void>
 }
 
 export type EmployeeStore = EmployeeStoreState & EmployeeStoreActions
@@ -26,26 +27,25 @@ export const useEmployeeStore = create<EmployeeStore>((set, get) => ({
   total: 0,
   loading: false,
   error: undefined,
-  page: 0,
-  size: 10,
   q: '',
-
-  setPage: (page: number) => {
-    set({ page, error: undefined })
-  },
-
-  setSize: (size: number) => {
-    set({ size, page: 0, error: undefined })
-  },
+  roleFilter: '',
+  statusFilter: '',
 
   setQuery: (q: string) => {
-    set({ q, page: 0, error: undefined })
+    set({ q, error: undefined })
+  },
+
+  setRoleFilter: (role: string) => {
+    set({ roleFilter: role, error: undefined })
+  },
+
+  setStatusFilter: (status: string) => {
+    set({ statusFilter: status, error: undefined })
   },
 
   fetchEmployees: async () => {
-    const { loading, page, size, q } = get()
+    const { loading, q, roleFilter, statusFilter } = get()
 
-    // Prevent duplicate calls
     if (loading) {
       return
     }
@@ -53,15 +53,15 @@ export const useEmployeeStore = create<EmployeeStore>((set, get) => ({
     set({ loading: true, error: undefined })
 
     try {
-      const response = await getEmployees({
-        page,
-        size,
-        ...(q && { q }),
+      const items = await getEmployees({
+        q: q || undefined,
+        role: roleFilter || undefined,
+        status: statusFilter || undefined,
       })
 
       set({
-        items: response.items,
-        total: response.total,
+        items,
+        total: items.length,
         loading: false,
       })
     } catch (error) {
@@ -73,5 +73,9 @@ export const useEmployeeStore = create<EmployeeStore>((set, get) => ({
         loading: false,
       })
     }
+  },
+
+  refetch: async () => {
+    await get().fetchEmployees()
   },
 }))

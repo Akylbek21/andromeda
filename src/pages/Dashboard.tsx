@@ -1,0 +1,107 @@
+import { Box, Typography, Paper, Grid, Card, CardContent, useTheme } from '@mui/material'
+import { People as PeopleIcon, TrendingUp as TrendingUpIcon, Assessment as AssessmentIcon } from '@mui/icons-material'
+
+export function Dashboard() {
+  const theme = useTheme()
+
+  const stats = [
+    { title: 'Всего сотрудников', value: '0', icon: PeopleIcon, color: theme.palette.primary.main },
+    { title: 'Активных', value: '0', icon: TrendingUpIcon, color: theme.palette.success.main },
+    { title: 'Отчеты', value: '0', icon: AssessmentIcon, color: theme.palette.secondary.main },
+  ]
+
+  return (
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      {/* Приветствие */}
+      <Box>
+        <Typography 
+          variant="h4" 
+          sx={{ 
+            fontWeight: 800, 
+            mb: 1,
+            background: 'linear-gradient(135deg, #F54264 0%, #F96741 45%, #FC8C1E 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+          }}
+        >
+          Добро пожаловать в Andromeda
+        </Typography>
+        <Typography variant="body1" color="text.secondary" sx={{ fontSize: '1.125rem' }}>
+          Обзор системы управления сотрудниками
+        </Typography>
+      </Box>
+
+      {/* Статистика */}
+      <Grid container spacing={3}>
+        {stats.map((stat, index) => {
+          const Icon = stat.icon
+          return (
+            <Grid item xs={12} sm={6} md={4} key={index}>
+              <Card 
+                elevation={2}
+                sx={{ 
+                  height: '100%',
+                  borderRadius: 2,
+                  border: '1px solid #E2E8F0',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-8px)',
+                    boxShadow: '0 12px 24px rgba(245, 66, 100, 0.15)',
+                  },
+                }}
+              >
+                <CardContent sx={{ p: 3 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                    <Box>
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontWeight: 600 }}>
+                        {stat.title}
+                      </Typography>
+                      <Typography variant="h4" sx={{ fontWeight: 700, color: stat.color }}>
+                        {stat.value}
+                      </Typography>
+                    </Box>
+                    <Box
+                      sx={{
+                        width: 56,
+                        height: 56,
+                        borderRadius: 2,
+                        backgroundColor: `${stat.color}15`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <Icon sx={{ fontSize: 32, color: stat.color }} />
+                    </Box>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          )
+        })}
+      </Grid>
+
+      {/* Информационная панель */}
+      <Paper
+        elevation={2}
+        sx={{
+          p: 4,
+          borderRadius: 2,
+          border: '1px solid #E2E8F0',
+          background: 'linear-gradient(135deg, rgba(245, 66, 100, 0.04) 0%, rgba(252, 140, 30, 0.04) 100%)',
+        }}
+      >
+        <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
+          Быстрый старт
+        </Typography>
+        <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
+          Система управления сотрудниками Andromeda помогает эффективно организовать работу с персоналом.
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Перейдите в раздел "Сотрудники" для начала работы.
+        </Typography>
+      </Paper>
+    </Box>
+  )
+}
