@@ -5,7 +5,6 @@ import {
   Paper,
   TextField,
   Button,
-  Stack,
   Alert,
   Table,
   TableHead,
@@ -16,6 +15,7 @@ import {
   IconButton,
   Tooltip,
   CircularProgress,
+  TableContainer,
 } from '@mui/material'
 import { Delete as DeleteIcon, Refresh as RefreshIcon } from '@mui/icons-material'
 import { useSnackbar } from 'notistack'
@@ -83,61 +83,125 @@ export function AllSessionsPage() {
   }
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Paper sx={{ p: 3, borderRadius: 2, border: '1px solid #E2E8F0' }}>
-        <Stack direction={{ xs: 'column', sm: 'row' }} alignItems={{ xs: 'flex-start', sm: 'center' }} justifyContent="space-between" spacing={2} mb={3}>
-          <Box>
-            <Typography variant="h4" fontWeight={700} gutterBottom>
-              Все сессии пользователя
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Введите userId, чтобы посмотреть и управлять его сессиями.
-            </Typography>
-          </Box>
-          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} width={{ xs: '100%', sm: 'auto' }}>
-            <TextField
-              size="small"
-              label="userId"
-              value={userId}
-              onChange={(e) => setUserId(e.target.value)}
-              placeholder="например, 42"
-            />
-            <Button
-              variant="contained"
-              startIcon={<RefreshIcon />}
-              onClick={() => void fetchSessions()}
-              disabled={!userId.trim() || loading}
-            >
-              Загрузить
-            </Button>
-            <Button
-              variant="outlined"
-              color="error"
-              onClick={() => void handleDeleteAll()}
-              disabled={!userId.trim() || loading || sessions.length === 0}
-            >
-              Удалить все
-            </Button>
-          </Stack>
-        </Stack>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+      <Box>
+        <Typography
+          variant="h4"
+          sx={{
+            fontWeight: 800,
+            mb: 1,
+            background: 'linear-gradient(135deg, #F54264 0%, #F96741 45%, #FC8C1E 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+          }}
+        >
+          Все сессии пользователя
+        </Typography>
+      </Box>
+
+      <Paper
+        elevation={2}
+        sx={{
+          p: 4,
+          borderRadius: 2,
+          border: '1px solid #E2E8F0',
+          backgroundColor: 'rgba(255, 255, 255, 0.85)',
+          backdropFilter: 'blur(10px)',
+        }}
+      >
+        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 3, flexWrap: 'wrap' }}>
+          <TextField
+            placeholder="userId"
+            variant="outlined"
+            size="medium"
+            label="userId"
+            value={userId}
+            onChange={(e) => setUserId(e.target.value)}
+            sx={{ flexGrow: 1, minWidth: 280, maxWidth: 480 }}
+          />
+          <Button
+            variant="contained"
+            startIcon={<RefreshIcon />}
+            onClick={() => void fetchSessions()}
+            disabled={!userId.trim() || loading}
+            size="large"
+            sx={{
+              whiteSpace: 'nowrap',
+              px: 3.5,
+              py: 1.5,
+              borderRadius: '8px',
+              background: 'linear-gradient(135deg, #F54264 0%, #F96741 45%, #FC8C1E 100%)',
+              boxShadow: '0 4px 12px rgba(245, 66, 100, 0.3)',
+              '&:hover': {
+                background: 'linear-gradient(135deg, #E03252 0%, #E85830 45%, #E67A17 100%)',
+                boxShadow: '0 8px 20px rgba(245, 66, 100, 0.4)',
+              },
+            }}
+          >
+            Загрузить
+          </Button>
+          <Button
+            variant="outlined"
+            color="error"
+            onClick={() => void handleDeleteAll()}
+            disabled={!userId.trim() || loading || sessions.length === 0}
+            size="large"
+            sx={{
+              whiteSpace: 'nowrap',
+              px: 3.5,
+              py: 1.5,
+              borderRadius: '8px',
+              borderWidth: '1px',
+              borderColor: '#E2E8F0',
+              '&:hover': {
+                borderWidth: '1px',
+              },
+            }}
+          >
+            Удалить все
+          </Button>
+        </Box>
 
         {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
+          <Alert
+            severity="error"
+            sx={{
+              mb: 3,
+              borderRadius: '8px',
+              border: '2px solid',
+              borderColor: 'error.light',
+            }}
+          >
             {error}
           </Alert>
         )}
 
-        <Box sx={{ position: 'relative' }}>
+        <Box sx={{ position: 'relative', minHeight: 400 }}>
           {loading && (
-            <Box sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'rgba(255,255,255,0.6)', zIndex: 1 }}>
-              <CircularProgress />
+            <Box
+              sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                backdropFilter: 'blur(4px)',
+                zIndex: 1,
+              }}
+            >
+              <CircularProgress size={48} thickness={4} />
             </Box>
           )}
 
-          <Table size="small">
+          <TableContainer>
+            <Table>
             <TableHead>
               <TableRow>
-                <TableCell>SID</TableCell>
                 <TableCell>Создана</TableCell>
                 <TableCell>Последний визит</TableCell>
                 <TableCell>IP</TableCell>
@@ -149,7 +213,6 @@ export function AllSessionsPage() {
             <TableBody>
               {sessions.map((session) => (
                 <TableRow key={session.sid} hover>
-                  <TableCell sx={{ maxWidth: 180, wordBreak: 'break-all' }}>{session.sid}</TableCell>
                   <TableCell>{formatDate(session.createdAt)}</TableCell>
                   <TableCell>{formatDate(session.lastSeenAt)}</TableCell>
                   <TableCell>{session.ip || '-'}</TableCell>
@@ -179,14 +242,13 @@ export function AllSessionsPage() {
               ))}
               {sessions.length === 0 && !loading && (
                 <TableRow>
-                  <TableCell colSpan={7} align="center" sx={{ py: 6, color: 'text.secondary' }}>
+                  <TableCell colSpan={6} align="center" sx={{ py: 6, color: 'text.secondary' }}>
                     Нет сессий
                   </TableCell>
                 </TableRow>
               )}
             </TableBody>
-          </Table>
-        </Box>
+          </Table>          </TableContainer>        </Box>
       </Paper>
     </Box>
   )

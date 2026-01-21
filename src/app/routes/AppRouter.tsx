@@ -1,7 +1,7 @@
 import { Navigate, RouterProvider, createBrowserRouter } from 'react-router-dom'
 import { LoginPage, CodePage } from '../../features/auth-login'
 import { HomePage } from '../../pages/HomePage'
-import { EmployeesPage } from '../../pages/employees/EmployeesPage'
+import EmployeesPage from '../../pages/employees/EmployeesPage'
 import { ProtectedRoute } from './ProtectedRoute'
 
 const router = createBrowserRouter([

@@ -35,15 +35,20 @@ export function LoginPage() {
   }
 
   return (
-    <Container maxWidth="sm">
-      <Box
-        sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
+    <Box
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundImage: 'url(/а.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed',
+      }}
+    >
+      <Container maxWidth="sm">
         <Paper
           elevation={3}
           sx={{
@@ -105,7 +110,7 @@ export function LoginPage() {
             </Button>
           </form>
         </Paper>
-      </Box>
-    </Container>
+      </Container>
+    </Box>
   )
 }

@@ -12,9 +12,9 @@ import {
   IconButton,
   Tooltip,
   Alert,
-  Stack,
   Button,
   CircularProgress,
+  TableContainer,
 } from '@mui/material'
 import { Delete as DeleteIcon, Refresh as RefreshIcon } from '@mui/icons-material'
 import { useSnackbar } from 'notistack'
@@ -78,51 +78,108 @@ export function MySessionsPage() {
   }
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Paper sx={{ p: 3, borderRadius: 2, border: '1px solid #E2E8F0' }}>
-        <Stack direction={{ xs: 'column', sm: 'row' }} alignItems={{ xs: 'flex-start', sm: 'center' }} justifyContent="space-between" spacing={2} mb={3}>
-          <Box>
-            <Typography variant="h4" fontWeight={700} gutterBottom>
-              Мои сессии
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Управляйте активными сессиями и завершайте лишние.
-            </Typography>
-          </Box>
-          <Stack direction="row" spacing={1}>
-            <Button
-              variant="outlined"
-              startIcon={<RefreshIcon />}
-              onClick={() => void fetchSessions()}
-              disabled={loading}
-            >
-              Обновить
-            </Button>
-            <Button
-              variant="contained"
-              color="error"
-              onClick={() => void handleDeleteOthers()}
-              disabled={loading || sessions.length === 0}
-            >
-              Завершить все кроме текущей
-            </Button>
-          </Stack>
-        </Stack>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+      <Box>
+        <Typography
+          variant="h4"
+          sx={{
+            fontWeight: 800,
+            mb: 1,
+            background: 'linear-gradient(135deg, #F54264 0%, #F96741 45%, #FC8C1E 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+          }}
+        >
+          Мои сессии
+        </Typography>
+      </Box>
+
+      <Paper
+        elevation={2}
+        sx={{
+          p: 4,
+          borderRadius: 2,
+          border: '1px solid #E2E8F0',
+          backgroundColor: 'rgba(255, 255, 255, 0.85)',
+          backdropFilter: 'blur(10px)',
+        }}
+      >
+        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 3, flexWrap: 'wrap' }}>
+          <Button
+            variant="outlined"
+            startIcon={<RefreshIcon />}
+            size="large"
+            onClick={() => void fetchSessions()}
+            disabled={loading}
+            sx={{
+              whiteSpace: 'nowrap',
+              px: 3.5,
+              py: 1.5,
+              borderRadius: '8px',
+              borderWidth: '1px',
+              borderColor: '#E2E8F0',
+              '&:hover': {
+                borderWidth: '1px',
+              },
+            }}
+          >
+            Обновить
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={() => void handleDeleteOthers()}
+            disabled={loading || sessions.length === 0}
+            size="large"
+            sx={{
+              whiteSpace: 'nowrap',
+              px: 3.5,
+              py: 1.5,
+              borderRadius: '8px',
+            }}
+          >
+            Завершить все кроме текущей
+          </Button>
+        </Box>
 
         {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
+          <Alert
+            severity="error"
+            sx={{
+              mb: 3,
+              borderRadius: '8px',
+              border: '2px solid',
+              borderColor: 'error.light',
+            }}
+          >
             {error}
           </Alert>
         )}
 
-        <Box sx={{ position: 'relative' }}>
+        <Box sx={{ position: 'relative', minHeight: 400 }}>
           {loading && (
-            <Box sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'rgba(255,255,255,0.6)', zIndex: 1 }}>
-              <CircularProgress />
+            <Box
+              sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                backdropFilter: 'blur(4px)',
+                zIndex: 1,
+              }}
+            >
+              <CircularProgress size={48} thickness={4} />
             </Box>
           )}
 
-          <Table size="small">
+          <TableContainer>
+            <Table>
             <TableHead>
               <TableRow>
                 <TableCell>Создана</TableCell>
@@ -171,8 +228,7 @@ export function MySessionsPage() {
                 </TableRow>
               )}
             </TableBody>
-          </Table>
-        </Box>
+          </Table>          </TableContainer>        </Box>
       </Paper>
     </Box>
   )

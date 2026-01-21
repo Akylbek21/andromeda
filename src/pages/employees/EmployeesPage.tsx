@@ -157,7 +157,8 @@ export default function EmployeesPage() {
           p: 4,
           borderRadius: 2,
           border: '1px solid #E2E8F0',
-          backgroundColor: '#FFFFFF',
+          backgroundColor: 'rgba(255, 255, 255, 0.85)',
+          backdropFilter: 'blur(10px)',
         }}
       >
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 3, flexWrap: 'wrap' }}>

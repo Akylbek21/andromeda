@@ -1,4 +1,4 @@
-import { Box, Typography, Paper, Grid, Card, CardContent, useTheme } from '@mui/material'
+import { Box, Typography, Paper, Card, CardContent, useTheme } from '@mui/material'
 import { People as PeopleIcon, TrendingUp as TrendingUpIcon, Assessment as AssessmentIcon } from '@mui/icons-material'
 
 export function Dashboard() {
@@ -33,17 +33,19 @@ export function Dashboard() {
       </Box>
 
       {/* Статистика */}
-      <Grid container spacing={3}>
+      <Box sx={{ display: 'grid', gap: 3, gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: 'repeat(3, 1fr)' } }}>
         {stats.map((stat, index) => {
           const Icon = stat.icon
           return (
-            <Grid item xs={12} sm={6} md={4} key={index}>
+            <Box key={index}>
               <Card 
                 elevation={2}
                 sx={{ 
                   height: '100%',
                   borderRadius: 2,
                   border: '1px solid #E2E8F0',
+                  backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                  backdropFilter: 'blur(10px)',
                   transition: 'all 0.3s ease',
                   '&:hover': {
                     transform: 'translateY(-8px)',
@@ -77,10 +79,10 @@ export function Dashboard() {
                   </Box>
                 </CardContent>
               </Card>
-            </Grid>
+            </Box>
           )
         })}
-      </Grid>
+      </Box>
 
       {/* Информационная панель */}
       <Paper

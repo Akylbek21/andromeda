@@ -200,7 +200,17 @@ export function AppLayout() {
   )
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box
+      sx={{
+        display: 'flex',
+        minHeight: '100vh',
+        position: 'relative',
+        backgroundImage: 'url(/а.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed',
+      }}
+    >
       <CssBaseline />
 
       <AppBar 
