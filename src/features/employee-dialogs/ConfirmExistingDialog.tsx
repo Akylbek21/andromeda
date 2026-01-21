@@ -13,6 +13,7 @@ import {
 import {
   confirmExistingUser,
   takePhoneAndCreate,
+  isEmployeesConflictError,
   type CreateEmployeeRequest,
   type ExistingUserInfo,
 } from '../../entities/employee'
@@ -39,10 +40,13 @@ export function ConfirmExistingDialog({
     setLoading(true)
     try {
       await confirmExistingUser(existingUser.userId, formData)
-      enqueueSnackbar('Сотрудник подтвержден', { variant: 'success' })
+      enqueueSnackbar('Успешно сохранено', { variant: 'success' })
       onSuccess()
-    } catch (error) {
-      enqueueSnackbar('Ошибка при подтверждении', { variant: 'error' })
+    } catch (error: unknown) {
+      const errorMessage = isEmployeesConflictError(error)
+        ? error.message
+        : error instanceof Error ? error.message : 'Ошибка при подтверждении'
+      enqueueSnackbar(errorMessage, { variant: 'error' })
     } finally {
       setLoading(false)
     }
@@ -52,10 +56,13 @@ export function ConfirmExistingDialog({
     setLoading(true)
     try {
       await takePhoneAndCreate(existingUser.userId, formData)
-      enqueueSnackbar('Номер отобран, сотрудник создан', { variant: 'success' })
+      enqueueSnackbar('Успешно сохранено', { variant: 'success' })
       onSuccess()
-    } catch (error) {
-      enqueueSnackbar('Ошибка при отборе номера', { variant: 'error' })
+    } catch (error: unknown) {
+      const errorMessage = isEmployeesConflictError(error)
+        ? error.message
+        : error instanceof Error ? error.message : 'Ошибка при отборе номера'
+      enqueueSnackbar(errorMessage, { variant: 'error' })
     } finally {
       setLoading(false)
     }
@@ -70,16 +77,16 @@ export function ConfirmExistingDialog({
         </Typography>
         <Box sx={{ mt: 2, p: 2, bgcolor: 'grey.100', borderRadius: 1 }}>
           <Typography>
-            <strong>ID:</strong> {existingUser.userId}
+            <strong>ID:</strong> {existingUser?.userId || '-'}
           </Typography>
           <Typography>
-            <strong>Фамилия и имя:</strong> {existingUser.lastName} {existingUser.firstName}
+            <strong>Фамилия и имя:</strong> {existingUser?.lastName || '-'} {existingUser?.firstName || '-'}
           </Typography>
           <Typography>
-            <strong>WhatsApp номер:</strong> {existingUser.phoneNumber}
+            <strong>WhatsApp номер:</strong> {existingUser?.phoneNumber || '-'}
           </Typography>
           <Typography>
-            <strong>ИИН:</strong> {existingUser.iin}
+            <strong>ИИН:</strong> {existingUser?.iin || '-'}
           </Typography>
         </Box>
       </DialogContent>

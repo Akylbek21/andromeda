@@ -250,7 +250,8 @@ export default function EmployeesPage() {
               <TableHead>
                 <TableRow>
                   <TableCell>ID</TableCell>
-                  <TableCell>Фамилия и имя</TableCell>
+                  <TableCell>Фамилия</TableCell>
+                  <TableCell>Имя</TableCell>
                   <TableCell>WhatsApp номер</TableCell>
                   <TableCell>ИИН</TableCell>
                   <TableCell>Роль</TableCell>
@@ -259,10 +260,11 @@ export default function EmployeesPage() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {sortedItems.map((employee) => (
-                  <TableRow key={employee.userId} hover>
+                {sortedItems.map((employee, index) => (
+                  <TableRow key={index} hover>
                     <TableCell>{employee.userId}</TableCell>
-                    <TableCell>{employee.lastName} {employee.firstName}</TableCell>
+                    <TableCell>{employee.lastName}</TableCell>
+                    <TableCell>{employee.firstName}</TableCell>
                     <TableCell>{formatPhoneNumber(employee.phoneNumber)}</TableCell>
                     <TableCell>{employee.iin}</TableCell>
                     <TableCell>{employee.role}</TableCell>

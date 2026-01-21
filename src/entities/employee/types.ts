@@ -1,6 +1,8 @@
 export type EmployeeRole = 'expert' | 'mentor' | 'teacher' | 'accountant' | 'head' | 'director'
 export type EmployeeStatus = 'active' | 'inactive'
 
+export type ConflictType = 'USER_EXISTS' | 'EMPLOYEE_EXISTS'
+
 export type Employee = {
   userId: number
   firstName: string
@@ -30,7 +32,7 @@ export interface CreateEmployeeRequest {
 }
 
 export interface UpdateEmployeeRequest {
-  iin?: string
+  iin?: string | null
   email?: string
   role?: 'expert' | 'mentor' | 'teacher' | 'accountant'
 }
@@ -45,4 +47,43 @@ export interface ExistingUserInfo {
   lastName: string
   phoneNumber: string
   iin: string
+}
+
+export interface ConflictResponse {
+  conflictType: ConflictType
+  user: ExistingUserInfo
+}
+
+// API Error types
+export interface ApiErrorResponse {
+  error: string
+  message: string
+  path: string
+  status: number
+  timestamp: string
+  userId?: number
+  existingUser?: ExistingUserInfo
+  conflictType?: ConflictType
+}
+
+// Specialized error for employee conflicts (400)
+export class EmployeesConflictError extends Error {
+  status: number
+  userId?: number
+  existingUser?: ExistingUserInfo
+  conflictType?: ConflictType
+
+  constructor(message: string, status: number, details?: Partial<EmployeesConflictError>) {
+    super(message)
+    this.name = 'EmployeesConflictError'
+    this.status = status
+    this.userId = details?.userId
+    this.existingUser = details?.existingUser
+    this.conflictType = details?.conflictType
+  }
+}
+
+// Type guard for conflict errors
+export function isEmployeesConflictError(error: unknown): error is EmployeesConflictError {
+  return error instanceof EmployeesConflictError
 }

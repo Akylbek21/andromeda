@@ -73,7 +73,7 @@ export function FilterDialog({
       <DialogActions>
         <Button onClick={onClose}>Отменить</Button>
         <Button onClick={handleApply} variant="contained">
-          Применить
+          Сохранить
         </Button>
       </DialogActions>
     </Dialog>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 import {
   Box,
   Drawer,
@@ -9,25 +9,34 @@ import {
   ListItemText,
   Button,
   Divider,
-} from '@mui/material';
-import LogoutIcon from '@mui/icons-material/Logout';
-import PeopleIcon from '@mui/icons-material/People';
+} from '@mui/material'
+import LogoutIcon from '@mui/icons-material/Logout'
+import PeopleIcon from '@mui/icons-material/People'
+import { useAuthStore } from '../entities/auth'
+import { hasAnyRole } from '../shared/utils/roleUtils'
 
 interface SidebarProps {
-  onLogout: () => void;
-  activeItem: string;
-  onMenuClick: (item: string) => void;
+  onLogout: () => void
+  activeItem: string
+  onMenuClick: (item: string) => void
 }
 
 const menuItems = [
-  { id: 'employees', label: 'Сотрудники', icon: PeopleIcon },
-];
+  { id: 'employees', label: 'Сотрудники', icon: PeopleIcon, requiredRoles: ['head', 'director'] },
+]
 
 export const Sidebar: React.FC<SidebarProps> = ({
   onLogout,
   activeItem,
   onMenuClick,
 }) => {
+  const user = useAuthStore((state) => state.user)
+
+  // Фильтруем пункты меню по ролям пользователя
+  const visibleMenuItems = menuItems.filter((item) => {
+    if (!item.requiredRoles) return true
+    return hasAnyRole(user, item.requiredRoles)
+  })
 
   return (
     <Drawer
@@ -81,8 +90,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
           },
         }}
       >
-        {menuItems.map((item) => {
-          const IconComponent = item.icon;
+        {visibleMenuItems.map((item) => {
+          const IconComponent = item.icon
           return (
             <ListItem
               key={item.id}
@@ -126,7 +135,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 />
               </ListItemButton>
             </ListItem>
-          );
+          )
         })}
       </List>
 
@@ -159,5 +168,5 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </Button>
       </Box>
     </Drawer>
-  );
-};
+  )
+}

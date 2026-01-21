@@ -9,11 +9,11 @@ export const createEmployeeSchema = yup.object().shape({
   email: yup
     .string()
     .required('Email \u043e\u0431\u044f\u0437\u0430\u0442\u0435\u043b\u0435\u043d')
-    .matches(/@gmail\\.com$/, 'Email \u0434\u043e\u043b\u0436\u0435\u043d \u0437\u0430\u043a\u0430\u043d\u0447\u0438\u0432\u0430\u0442\u044c\u0441\u044f \u043d\u0430 @gmail.com'),
+    .matches(/@gmail\.com$/, 'Email \u0434\u043e\u043b\u0436\u0435\u043d \u0437\u0430\u043a\u0430\u043d\u0447\u0438\u0432\u0430\u0442\u044c\u0441\u044f \u043d\u0430 @gmail.com'),
   iin: yup.string().when('notCitizen', {
     is: false,
     then: (schema) => schema.required('\u0418\u0418\u041d \u043e\u0431\u044f\u0437\u0430\u0442\u0435\u043b\u0435\u043d'),
-    otherwise: (schema) => schema.notRequired(),
+    otherwise: (schema) => schema.transform((value) => value || '000000000000').default('000000000000'),
   }),
   notCitizen: yup.boolean(),
   role: yup

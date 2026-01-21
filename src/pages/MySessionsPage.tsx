@@ -125,7 +125,6 @@ export function MySessionsPage() {
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell>SID</TableCell>
                 <TableCell>Создана</TableCell>
                 <TableCell>Последний визит</TableCell>
                 <TableCell>IP</TableCell>
@@ -137,7 +136,6 @@ export function MySessionsPage() {
             <TableBody>
               {sessions.map((session) => (
                 <TableRow key={session.sid} hover selected={session.isCurrent}>
-                  <TableCell sx={{ maxWidth: 180, wordBreak: 'break-all' }}>{session.sid}</TableCell>
                   <TableCell>{formatDate(session.createdAt)}</TableCell>
                   <TableCell>{formatDate(session.lastSeenAt)}</TableCell>
                   <TableCell>{session.ip || '-'}</TableCell>

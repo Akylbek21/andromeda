@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useSnackbar } from 'notistack'
@@ -16,8 +16,10 @@ import {
 import {
   updateEmployeePhone,
   takePhoneFrom,
+  isEmployeesConflictError,
   type Employee,
   type UpdatePhoneRequest,
+  type ExistingUserInfo,
 } from '../../entities/employee'
 import { updatePhoneSchema } from './schemas'
 
@@ -31,7 +33,7 @@ interface EditPhoneDialogProps {
 export function EditPhoneDialog({ open, employee, onClose, onSuccess }: EditPhoneDialogProps) {
   const { enqueueSnackbar } = useSnackbar()
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [conflictUser, setConflictUser] = useState<any>(null)
+  const [conflictUser, setConflictUser] = useState<ExistingUserInfo | null>(null)
 
   const {
     control,
@@ -46,20 +48,33 @@ export function EditPhoneDialog({ open, employee, onClose, onSuccess }: EditPhon
     },
   })
 
+  // Обновляем форму при изменении employee
+  useEffect(() => {
+    if (employee) {
+      reset({
+        phoneNumber: employee.phoneNumber || '',
+      })
+    }
+  }, [employee, reset])
+
   const onSubmit = async (data: UpdatePhoneRequest) => {
     if (!employee) return
     setIsSubmitting(true)
     try {
       await updateEmployeePhone(employee.userId, data)
-      enqueueSnackbar('Номер обновлен', { variant: 'success' })
+      enqueueSnackbar('Успешно сохранено', { variant: 'success' })
       reset()
       onClose()
       onSuccess()
-    } catch (error: any) {
-      if (error?.response?.status === 409) {
-        setConflictUser(error.response.data)
+    } catch (error: unknown) {
+      if (isEmployeesConflictError(error)) {
+        // Set conflict user from error details
+        if (error.existingUser) {
+          setConflictUser(error.existingUser)
+        }
       } else {
-        enqueueSnackbar('Ошибка при обновлении номера', { variant: 'error' })
+        const errorMessage = error instanceof Error ? error.message : 'Ошибка при обновлении номера'
+        enqueueSnackbar(errorMessage, { variant: 'error' })
       }
     } finally {
       setIsSubmitting(false)
@@ -71,13 +86,16 @@ export function EditPhoneDialog({ open, employee, onClose, onSuccess }: EditPhon
     setIsSubmitting(true)
     try {
       await takePhoneFrom(employee.userId, conflictUser.userId, getValues('phoneNumber'))
-      enqueueSnackbar('Номер отобран', { variant: 'success' })
+      enqueueSnackbar('Успешно сохранено', { variant: 'success' })
       reset()
       setConflictUser(null)
       onClose()
       onSuccess()
-    } catch (error) {
-      enqueueSnackbar('Ошибка при отборе номера', { variant: 'error' })
+    } catch (error: unknown) {
+      const errorMessage = isEmployeesConflictError(error)
+        ? error.message
+        : error instanceof Error ? error.message : 'Ошибка при отборе номера'
+      enqueueSnackbar(errorMessage, { variant: 'error' })
     } finally {
       setIsSubmitting(false)
     }

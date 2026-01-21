@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import type { Employee } from './index'
-import { getEmployees, searchEmployees } from './index'
+import { getEmployees } from './index'
 
 export interface EmployeeStoreState {
   items: Employee[]

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useSnackbar } from 'notistack'
@@ -12,7 +12,12 @@ import {
   MenuItem,
   CircularProgress,
 } from '@mui/material'
-import { updateEmployee, type Employee, type UpdateEmployeeRequest } from '../../entities/employee'
+import { 
+  updateEmployee, 
+  isEmployeesConflictError,
+  type Employee, 
+  type UpdateEmployeeRequest 
+} from '../../entities/employee'
 import { updateEmployeeSchema } from './schemas'
 
 interface EditEmployeeDialogProps {
@@ -40,17 +45,32 @@ export function EditEmployeeDialog({ open, employee, onClose, onSuccess }: EditE
     },
   })
 
-  const onSubmit = async (data: any) => {
+  // Обновляем форму при изменении employee
+  useEffect(() => {
+    if (employee) {
+      reset({
+        iin: employee.iin || '',
+        email: employee.email || '',
+        role: employee.role || 'expert',
+      })
+    }
+  }, [employee, reset])
+
+  const onSubmit = async (data: unknown) => {
     if (!employee) return
+    const formData = data as UpdateEmployeeRequest
     setIsSubmitting(true)
     try {
-      await updateEmployee(employee.userId, data as UpdateEmployeeRequest)
-      enqueueSnackbar('Сотрудник обновлен', { variant: 'success' })
+      await updateEmployee(employee.userId, formData as UpdateEmployeeRequest)
+      enqueueSnackbar('Успешно сохранено', { variant: 'success' })
       reset()
       onClose()
       onSuccess()
-    } catch (error) {
-      enqueueSnackbar('Ошибка при обновлении', { variant: 'error' })
+    } catch (error: unknown) {
+      const errorMessage = isEmployeesConflictError(error)
+        ? error.message
+        : error instanceof Error ? error.message : 'Ошибка при обновлении'
+      enqueueSnackbar(errorMessage, { variant: 'error' })
     } finally {
       setIsSubmitting(false)
     }

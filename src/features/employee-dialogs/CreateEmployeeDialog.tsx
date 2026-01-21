@@ -14,9 +14,19 @@ import {
   Checkbox,
   CircularProgress,
 } from '@mui/material'
-import { createEmployee, type CreateEmployeeRequest } from '../../entities/employee'
+import { 
+  createEmployee, 
+  type CreateEmployeeRequest,
+  type ExistingUserInfo,
+  isEmployeesConflictError,
+  takePhoneAndCreate,
+  confirmExistingUser,
+} from '../../entities/employee'
 import { createEmployeeSchema } from './schemas'
-import { ConfirmExistingDialog } from './ConfirmExistingDialog'
+import { ExistingUserDialog } from './ExistingUserDialog'
+import { EmployeeExistsDialog } from './EmployeeExistsDialog'
+import { RefusalDialog } from './RefusalDialog'
+import { determineConflictScenario, hasValidExistingUserData, type ConflictScenario } from './conflict-utils'
 
 interface CreateEmployeeDialogProps {
   open: boolean
@@ -24,10 +34,18 @@ interface CreateEmployeeDialogProps {
   onSuccess: () => void
 }
 
+interface ConflictState {
+  scenario: ConflictScenario
+  existingUser: ExistingUserInfo | null
+  formData: CreateEmployeeRequest
+  errorMessage: string
+}
+
 export function CreateEmployeeDialog({ open, onClose, onSuccess }: CreateEmployeeDialogProps) {
   const { enqueueSnackbar } = useSnackbar()
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [confirmData, setConfirmData] = useState<any>(null)
+  const [conflictState, setConflictState] = useState<ConflictState | null>(null)
+  const [showRefusal, setShowRefusal] = useState(false)
 
   const {
     control,
@@ -50,23 +68,45 @@ export function CreateEmployeeDialog({ open, onClose, onSuccess }: CreateEmploye
 
   const notCitizen = watch('notCitizen')
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: unknown) => {
+    const formData = data as CreateEmployeeRequest
     setIsSubmitting(true)
     try {
-      await createEmployee(data as CreateEmployeeRequest)
-      enqueueSnackbar('Сотрудник успешно добавлен', { variant: 'success' })
+      // Если не гражданин РК и ИИН пустой, устанавливаем значение по умолчанию
+      const payload = {
+        ...formData,
+        iin: formData.notCitizen && !formData.iin ? '000000000000' : formData.iin
+      }
+      await createEmployee(payload as CreateEmployeeRequest)
+      enqueueSnackbar('Сотрудник добавлен', { variant: 'success' })
       reset()
       onClose()
       onSuccess()
-    } catch (error: any) {
-      if (error?.response?.status === 409) {
-        // User exists
-        setConfirmData({
-          formData: data,
-          existingUser: error.response.data,
-        })
+    } catch (error: unknown) {
+      if (isEmployeesConflictError(error)) {
+        const scenario = determineConflictScenario(error)
+        const hasData = hasValidExistingUserData(error)
+
+        if (!hasData) {
+          // Show warning if backend didn't provide user data
+          enqueueSnackbar('Бэк не вернул данные существующего пользователя', { variant: 'warning' })
+          setConflictState({
+            scenario,
+            existingUser: null,
+            formData,
+            errorMessage: error.message || 'Конфликт при добавлении сотрудника',
+          })
+        } else {
+          setConflictState({
+            scenario,
+            existingUser: error.existingUser || null,
+            formData,
+            errorMessage: error.message || 'Конфликт при добавлении сотрудника',
+          })
+        }
       } else {
-        enqueueSnackbar('Ошибка при добавлении сотрудника', { variant: 'error' })
+        const errorMessage = error instanceof Error ? error.message : 'Ошибка при добавлении сотрудника'
+        enqueueSnackbar(errorMessage, { variant: 'error' })
       }
     } finally {
       setIsSubmitting(false)
@@ -75,6 +115,73 @@ export function CreateEmployeeDialog({ open, onClose, onSuccess }: CreateEmploye
 
   const handleClose = () => {
     reset()
+    setConflictState(null)
+    setShowRefusal(false)
+    onClose()
+  }
+
+  const handleConflictClose = () => {
+    setConflictState(null)
+  }
+
+  const handleExistingUserConfirm = async () => {
+    if (!conflictState?.existingUser) return
+    
+    setIsSubmitting(true)
+    try {
+      const payload = {
+        ...conflictState.formData,
+        iin: conflictState.formData.notCitizen && !conflictState.formData.iin 
+          ? '000000000000' 
+          : conflictState.formData.iin
+      }
+      await confirmExistingUser(conflictState.existingUser.userId, payload)
+      enqueueSnackbar('Сотрудник добавлен', { variant: 'success' })
+      reset()
+      setConflictState(null)
+      onClose()
+      onSuccess()
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Ошибка при подтверждении пользователя'
+      enqueueSnackbar(errorMessage, { variant: 'error' })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleEmployeeExistsConfirm = () => {
+    // Show refusal dialog
+    setShowRefusal(true)
+  }
+
+  const handleTakePhone = async () => {
+    if (!conflictState?.existingUser) return
+    
+    setIsSubmitting(true)
+    try {
+      const payload = {
+        ...conflictState.formData,
+        iin: conflictState.formData.notCitizen && !conflictState.formData.iin 
+          ? '000000000000' 
+          : conflictState.formData.iin
+      }
+      await takePhoneAndCreate(conflictState.existingUser.userId, payload)
+      enqueueSnackbar('Сотрудник добавлен', { variant: 'success' })
+      reset()
+      setConflictState(null)
+      onClose()
+      onSuccess()
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Ошибка при отборе номера'
+      enqueueSnackbar(errorMessage, { variant: 'error' })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleRefusalClose = () => {
+    setShowRefusal(false)
+    setConflictState(null)
     onClose()
   }
 
@@ -205,17 +312,37 @@ export function CreateEmployeeDialog({ open, onClose, onSuccess }: CreateEmploye
         </DialogActions>
       </Dialog>
 
-      {confirmData && (
-        <ConfirmExistingDialog
-          open={!!confirmData}
-          existingUser={confirmData.existingUser}
-          formData={confirmData.formData}
-          onClose={() => setConfirmData(null)}
-          onSuccess={() => {
-            setConfirmData(null)
-            handleClose()
-            onSuccess()
-          }}
+      {/* Show refusal dialog first if user confirmed "это он" in EmployeeExistsDialog */}
+      {showRefusal && (
+        <RefusalDialog
+          open={showRefusal}
+          onClose={handleRefusalClose}
+        />
+      )}
+
+      {/* ExistingUserDialog - for "Пользователь с таким номером уже существует" scenario */}
+      {conflictState && conflictState.scenario === 'USER_EXISTS' && !showRefusal && (
+        <ExistingUserDialog
+          open={!!conflictState}
+          existingUser={conflictState.existingUser}
+          errorMessage={conflictState.errorMessage}
+          isSubmitting={isSubmitting}
+          onConfirm={handleExistingUserConfirm}
+          onTakePhone={handleTakePhone}
+          onClose={handleConflictClose}
+        />
+      )}
+
+      {/* EmployeeExistsDialog - for "Сотрудник с таким номером телефона уже существует" scenario */}
+      {conflictState && conflictState.scenario === 'EMPLOYEE_EXISTS' && !showRefusal && (
+        <EmployeeExistsDialog
+          open={!!conflictState}
+          existingUser={conflictState.existingUser}
+          errorMessage={conflictState.errorMessage}
+          isSubmitting={isSubmitting}
+          onConfirm={handleEmployeeExistsConfirm}
+          onTakePhone={handleTakePhone}
+          onClose={handleConflictClose}
         />
       )}
     </>
