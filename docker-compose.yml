@@ -1,0 +1,22 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: andromeda-frontend
+    ports:
+      - "80:80"
+      - "443:443"  # Если будет SSL
+    volumes:
+      # Для SSL сертификатов (если используете Let's Encrypt)
+      # - ./certbot/conf:/etc/letsencrypt:ro
+      # - ./certbot/www:/var/www/certbot:ro
+    restart: unless-stopped
+    environment:
+      - VITE_API_BASE_URL=${VITE_API_BASE_URL:-https://yadro.andromedaedu.kz}
+    networks:
+      - andromeda-network
+
+networks:
+  andromeda-network:
+    driver: bridge
