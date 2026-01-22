@@ -58,6 +58,17 @@ http.interceptors.response.use(
       _retry?: boolean
     }
 
+    // Не обрабатываем 401 для публичных auth эндпоинтов
+    const url = originalRequest?.url || ''
+    const isAuthEndpoint = url.includes('/auth/send-code') || 
+                          url.includes('/auth/login') || 
+                          url.includes('/auth/refresh')
+    
+    // Если это публичный auth эндпоинт - просто возвращаем ошибку без попытки refresh
+    if (isAuthEndpoint) {
+      return Promise.reject(error)
+    }
+
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
