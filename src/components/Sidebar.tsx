@@ -14,6 +14,7 @@ import LogoutIcon from '@mui/icons-material/Logout'
 import PeopleIcon from '@mui/icons-material/People'
 import { useAuthStore } from '../entities/auth'
 import { hasAnyRole } from '../shared/utils/roleUtils'
+import type { User } from '../entities/auth/types'
 
 interface SidebarProps {
   onLogout: () => void
@@ -22,7 +23,13 @@ interface SidebarProps {
 }
 
 const menuItems = [
-  { id: 'employees', label: 'Сотрудники', icon: PeopleIcon, requiredRoles: ['head', 'director'] },
+  {
+    id: 'employees',
+    label: 'Сотрудники',
+    icon: PeopleIcon,
+    sectionKey: 'employees',
+    fallbackRoles: ['head', 'director', 'admin', 'ADMIN'],
+  },
 ]
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -32,10 +39,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const user = useAuthStore((state) => state.user)
 
-  // Фильтруем пункты меню по ролям пользователя
+  // Показываем пункт, если есть нужный раздел или подходящая роль (fallback)
   const visibleMenuItems = menuItems.filter((item) => {
-    if (!item.requiredRoles) return true
-    return hasAnyRole(user, item.requiredRoles)
+    const hasSectionAccess = item.sectionKey
+      ? Boolean(user?.sections?.[item.sectionKey as keyof User['sections']])
+      : false
+
+    if (hasSectionAccess) return true
+
+    if (item.fallbackRoles) {
+      return hasAnyRole(user, item.fallbackRoles)
+    }
+
+    return true
   })
 
   return (

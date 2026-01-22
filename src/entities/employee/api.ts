@@ -44,16 +44,38 @@ interface GetEmployeesParams {
   status?: string
 }
 
-export async function getEmployees(params?: GetEmployeesParams): Promise<Employee[]> {
-  const { data } = await http.get<Employee[]>('/api/v1/employees', { params })
-  return data
+type EmployeesResponse = {
+  items?: Employee[]
+  content?: Employee[]
+  total?: number
+  totalElements?: number
+} | Employee[]
+
+const normalizeEmployeesResponse = (data: EmployeesResponse): { items: Employee[]; total: number } => {
+  if (Array.isArray(data)) {
+    return { items: data, total: data.length }
+  }
+
+  const items = data.items ?? data.content ?? []
+  const total = data.total ?? data.totalElements ?? items.length
+
+  return { items, total }
 }
 
-export async function searchEmployees(q: string): Promise<Employee[]> {
-  const { data } = await http.get<Employee[]>('/api/v1/employees/search', {
-    params: { q },
+export async function getEmployees(params?: GetEmployeesParams): Promise<{ items: Employee[]; total: number }> {
+  const { data } = await http.get<EmployeesResponse>('/api/v1/employees', {
+    params,
   })
-  return data
+
+  return normalizeEmployeesResponse(data)
+}
+
+export async function searchEmployees(params: { q: string; page?: number; size?: number }): Promise<{ items: Employee[]; total: number }> {
+  const { data } = await http.get<EmployeesResponse>('/api/v1/employees/search', {
+    params,
+  })
+
+  return normalizeEmployeesResponse(data)
 }
 
 export async function createEmployee(payload: CreateEmployeeRequest): Promise<Employee> {

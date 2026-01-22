@@ -21,7 +21,7 @@ const router = createBrowserRouter([
   {
     path: '/employees',
     element: (
-      <ProtectedRoute requiredRoles={['head', 'director']}>
+      <ProtectedRoute requiredRoles={['head', 'director', 'admin', 'ADMIN']} requiredSections={['employees', 'admin']}>
         <EmployeesPage />
       </ProtectedRoute>
     ),

@@ -8,7 +8,7 @@ export default defineConfig({
     strictPort: true,
     proxy: {
       '/api': {
-        target: 'https://yadro.andromedaedu.kz',
+        target: 'https://api.andromedaedu.kz',
         changeOrigin: true,
         secure: true,
       },

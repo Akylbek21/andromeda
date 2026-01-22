@@ -11,11 +11,11 @@ export function hasAnyRole(user: User | null, requiredRoles: string[]): boolean 
     return false
   }
 
-  // Если роли - строка, конвертируем в массив
   const userRoles = Array.isArray(user.roles) ? user.roles : [user.roles]
+  const normalizedUserRoles = userRoles.map((role) => role.toLowerCase())
+  const normalizedRequired = requiredRoles.map((role) => role.toLowerCase())
 
-  // Проверяем, есть ли пересечение между ролями пользователя и требуемыми ролями
-  return requiredRoles.some((role) => userRoles.includes(role))
+  return normalizedRequired.some((role) => normalizedUserRoles.includes(role))
 }
 
 /**
@@ -30,6 +30,8 @@ export function hasAllRoles(user: User | null, requiredRoles: string[]): boolean
   }
 
   const userRoles = Array.isArray(user.roles) ? user.roles : [user.roles]
+  const normalizedUserRoles = userRoles.map((role) => role.toLowerCase())
+  const normalizedRequired = requiredRoles.map((role) => role.toLowerCase())
 
-  return requiredRoles.every((role) => userRoles.includes(role))
+  return normalizedRequired.every((role) => normalizedUserRoles.includes(role))
 }

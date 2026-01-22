@@ -4,26 +4,29 @@ import { Box, CircularProgress, Paper, Typography, Button } from '@mui/material'
 import { getAccessToken } from '../../shared/api/tokens'
 import { useAuthStore } from '../../entities/auth'
 import { hasAnyRole } from '../../shared/utils/roleUtils'
+import type { UserSections } from '../../entities/auth/types'
 
 interface ProtectedRouteProps {
   children: React.ReactNode
   requiredRoles?: string[]
+  requiredSections?: (keyof UserSections)[]
 }
 
-export function ProtectedRoute({ children, requiredRoles }: ProtectedRouteProps) {
+export function ProtectedRoute({ children, requiredRoles, requiredSections }: ProtectedRouteProps) {
   const { user, loading, loadMe } = useAuthStore()
   const token = getAccessToken()
 
+  // Нет токена - сразу редирект на логин, НЕ вызываем loadMe()
+  if (!token) {
+    return <Navigate to="/login" replace />
+  }
+
   useEffect(() => {
+    // Вызываем loadMe() только если есть токен
     if (token && !user && !loading) {
       loadMe()
     }
   }, [token, user, loading, loadMe])
-
-  // Нет токена - редирект на логин
-  if (!token) {
-    return <Navigate to="/login" replace />
-  }
 
   // Токен есть, но данные пользователя загружаются
   if (loading || !user) {
@@ -41,42 +44,47 @@ export function ProtectedRoute({ children, requiredRoles }: ProtectedRouteProps)
     )
   }
 
-  // Проверяем требуемые роли
-  if (requiredRoles && requiredRoles.length > 0) {
-    if (!hasAnyRole(user, requiredRoles)) {
-      return (
-        <Box
+  const lacksSectionAccess = requiredSections?.length
+    ? !requiredSections.some((section) => user.sections?.[section])
+    : false
+
+  const lacksRoleAccess = requiredRoles?.length
+    ? !hasAnyRole(user, requiredRoles)
+    : false
+
+  if (lacksSectionAccess || lacksRoleAccess) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '100vh',
+          p: 2,
+        }}
+      >
+        <Paper
           sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            minHeight: '100vh',
-            p: 2,
+            textAlign: 'center',
+            p: 4,
+            maxWidth: 500,
           }}
         >
-          <Paper
-            sx={{
-              textAlign: 'center',
-              p: 4,
-              maxWidth: 500,
-            }}
+          <Typography variant="h5" sx={{ mb: 2, fontWeight: 700 }}>
+            Нет доступа
+          </Typography>
+          <Typography variant="body1" sx={{ mb: 3, color: 'text.secondary' }}>
+            У вас недостаточно прав для доступа к этому разделу.
+          </Typography>
+          <Button
+            variant="contained"
+            onClick={() => (window.location.href = '/')}
           >
-            <Typography variant="h5" sx={{ mb: 2, fontWeight: 700 }}>
-              Нет доступа
-            </Typography>
-            <Typography variant="body1" sx={{ mb: 3, color: 'text.secondary' }}>
-              У вас недостаточно прав для доступа к этому разделу.
-            </Typography>
-            <Button
-              variant="contained"
-              onClick={() => (window.location.href = '/')}
-            >
-              На главную
-            </Button>
-          </Paper>
-        </Box>
-      )
-    }
+            На главную
+          </Button>
+        </Paper>
+      </Box>
+    )
   }
 
   // Пользователь загружен - показываем контент

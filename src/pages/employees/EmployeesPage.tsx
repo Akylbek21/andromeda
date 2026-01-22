@@ -16,6 +16,7 @@ import {
   Menu,
   MenuItem,
   TableContainer,
+  TablePagination,
 } from '@mui/material'
 import {
   Add as AddIcon,
@@ -48,9 +49,14 @@ export default function EmployeesPage() {
     error,
     roleFilter,
     statusFilter,
+    total,
+    page,
+    size,
     setQuery,
     setRoleFilter,
     setStatusFilter,
+    setPage,
+    setSize,
     fetchEmployees,
     refetch,
   } = useEmployeeStore()
@@ -69,8 +75,11 @@ export default function EmployeesPage() {
 
   useEffect(() => {
     setQuery(debouncedQuery)
+  }, [debouncedQuery, setQuery])
+
+  useEffect(() => {
     fetchEmployees()
-  }, [debouncedQuery, roleFilter, statusFilter, setQuery, fetchEmployees])
+  }, [debouncedQuery, roleFilter, statusFilter, page, size, fetchEmployees])
 
   const handleSearchChange = (value: string) => {
     setQ(value)
@@ -79,6 +88,7 @@ export default function EmployeesPage() {
   const handleFilterApply = (role: string, status: string) => {
     setRoleFilter(role)
     setStatusFilter(status)
+    setPage(0)
     setFilterDialogOpen(false)
   }
 
@@ -129,9 +139,8 @@ export default function EmployeesPage() {
     refetch()
   }
 
-  const sortedItems = [...items].sort((a, b) =>
-    a.lastName.localeCompare(b.lastName, 'ru')
-  )
+  const itemsSafe = Array.isArray(items) ? items : []
+  const sortedItems = [...itemsSafe]
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -302,6 +311,17 @@ export default function EmployeesPage() {
             <MenuItem onClick={handleMakeHead}>Назначить руководителем</MenuItem>
           )}
         </Menu>
+
+        <TablePagination
+          component="div"
+          count={total}
+          page={page}
+          onPageChange={(_, nextPage) => setPage(nextPage)}
+          rowsPerPage={size}
+          onRowsPerPageChange={(event) => setSize(parseInt(event.target.value, 10))}
+          rowsPerPageOptions={[10, 20, 50]}
+          labelRowsPerPage="Строк на странице"
+        />
       </Paper>
 
       <CreateEmployeeDialog

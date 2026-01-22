@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import type { Employee } from './index'
-import { getEmployees } from './index'
+import { getEmployees, searchEmployees } from './index'
 
 export interface EmployeeStoreState {
   items: Employee[]
@@ -10,12 +10,16 @@ export interface EmployeeStoreState {
   q: string
   roleFilter: string
   statusFilter: string
+  page: number
+  size: number
 }
 
 export interface EmployeeStoreActions {
   setQuery: (q: string) => void
   setRoleFilter: (role: string) => void
   setStatusFilter: (status: string) => void
+  setPage: (page: number) => void
+  setSize: (size: number) => void
   fetchEmployees: () => Promise<void>
   refetch: () => Promise<void>
 }
@@ -30,21 +34,31 @@ export const useEmployeeStore = create<EmployeeStore>((set, get) => ({
   q: '',
   roleFilter: '',
   statusFilter: '',
+  page: 0,
+  size: 20,
 
   setQuery: (q: string) => {
-    set({ q, error: undefined })
+    set({ q, error: undefined, page: 0 })
   },
 
   setRoleFilter: (role: string) => {
-    set({ roleFilter: role, error: undefined })
+    set({ roleFilter: role, error: undefined, page: 0 })
   },
 
   setStatusFilter: (status: string) => {
-    set({ statusFilter: status, error: undefined })
+    set({ statusFilter: status, error: undefined, page: 0 })
+  },
+
+  setPage: (page: number) => {
+    set({ page })
+  },
+
+  setSize: (size: number) => {
+    set({ size, page: 0 })
   },
 
   fetchEmployees: async () => {
-    const { loading, q, roleFilter, statusFilter } = get()
+    const { loading, q, roleFilter, statusFilter, page, size } = get()
 
     if (loading) {
       return
@@ -53,15 +67,18 @@ export const useEmployeeStore = create<EmployeeStore>((set, get) => ({
     set({ loading: true, error: undefined })
 
     try {
-      const items = await getEmployees({
+      const fetcher = q ? searchEmployees : getEmployees
+      const { items, total } = await fetcher({
         q: q || undefined,
         role: roleFilter || undefined,
         status: statusFilter || undefined,
-      })
+        page,
+        size,
+      } as any)
 
       set({
         items,
-        total: items.length,
+        total,
         loading: false,
       })
     } catch (error) {
