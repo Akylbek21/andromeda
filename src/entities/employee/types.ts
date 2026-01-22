@@ -1,4 +1,4 @@
-export type EmployeeRole = 'expert' | 'mentor' | 'teacher' | 'accountant' | 'head' | 'director'
+export type EmployeeRole = 'expert' | 'mentor' | 'teacher' | 'accountant' | 'head' | 'director' | 'admin'
 export type EmployeeStatus = 'active' | 'inactive'
 
 export type ConflictType = 'USER_EXISTS' | 'EMPLOYEE_EXISTS'
@@ -34,7 +34,7 @@ export interface CreateEmployeeRequest {
 export interface UpdateEmployeeRequest {
   iin?: string | null
   email?: string
-  role?: 'expert' | 'mentor' | 'teacher' | 'accountant'
+  role?: 'expert' | 'mentor' | 'teacher' | 'accountant' | 'head' | 'director' | 'admin'
 }
 
 export interface UpdatePhoneRequest {

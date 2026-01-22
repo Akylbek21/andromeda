@@ -32,7 +32,11 @@ export const router = createBrowserRouter([
       },
       {
         path: '/employees',
-        element: <EmployeesPage />,
+        element: (
+          <ProtectedRoute requiredRoles={['head', 'director', 'admin']}>
+            <EmployeesPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: '/my-sessions',

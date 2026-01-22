@@ -126,6 +126,9 @@ export function EditEmployeeDialog({ open, employee, onClose, onSuccess }: EditE
               <MenuItem value="mentor">Mentor</MenuItem>
               <MenuItem value="teacher">Teacher</MenuItem>
               <MenuItem value="accountant">Accountant</MenuItem>
+              <MenuItem value="head">Head</MenuItem>
+              <MenuItem value="director">Director</MenuItem>
+              <MenuItem value="admin">Admin</MenuItem>
             </TextField>
           )}
         />

@@ -67,14 +67,30 @@ export const useEmployeeStore = create<EmployeeStore>((set, get) => ({
     set({ loading: true, error: undefined })
 
     try {
-      const fetcher = q ? searchEmployees : getEmployees
-      const { items, total } = await fetcher({
-        q: q || undefined,
-        role: roleFilter || undefined,
-        status: statusFilter || undefined,
-        page,
-        size,
-      } as any)
+      let items: Employee[]
+      let total: number
+
+      // Use searchEmployees if there's a query, otherwise use getEmployees with filters
+      if (q) {
+        const result = await searchEmployees({
+          q,
+          role: roleFilter || undefined,
+          status: statusFilter || undefined,
+          page,
+          size,
+        })
+        items = result.items
+        total = result.total
+      } else {
+        const result = await getEmployees({
+          role: roleFilter || undefined,
+          status: statusFilter || undefined,
+          page,
+          size,
+        })
+        items = result.items
+        total = result.total
+      }
 
       set({
         items,

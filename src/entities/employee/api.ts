@@ -51,12 +51,40 @@ type EmployeesResponse = {
   totalElements?: number
 } | Employee[]
 
-const normalizeEmployeesResponse = (data: EmployeesResponse): { items: Employee[]; total: number } => {
-  if (Array.isArray(data)) {
-    return { items: data, total: data.length }
+const normalizeEmployee = (employee: Employee): Employee => {
+  return {
+    ...employee,
+    status: employee.status?.toLowerCase() as Employee['status'],
+    role: employee.role?.toLowerCase() as Employee['role'],
+  }
+}
+
+const toApiRole = (role?: string) => (role ? role.toUpperCase() : role)
+
+const sanitizeUpdatePayload = (payload: UpdateEmployeeRequest): Partial<UpdateEmployeeRequest> => {
+  const result: Partial<UpdateEmployeeRequest> = {}
+
+  if (payload.iin && payload.iin.trim() !== '') {
+    result.iin = payload.iin
   }
 
-  const items = data.items ?? data.content ?? []
+  if (payload.email && payload.email.trim() !== '') {
+    result.email = payload.email
+  }
+
+  if (payload.role) {
+    result.role = payload.role
+  }
+
+  return result
+}
+
+const normalizeEmployeesResponse = (data: EmployeesResponse): { items: Employee[]; total: number } => {
+  if (Array.isArray(data)) {
+    return { items: data.map(normalizeEmployee), total: data.length }
+  }
+
+  const items = (data.items ?? data.content ?? []).map(normalizeEmployee)
   const total = data.total ?? data.totalElements ?? items.length
 
   return { items, total }
@@ -70,7 +98,7 @@ export async function getEmployees(params?: GetEmployeesParams): Promise<{ items
   return normalizeEmployeesResponse(data)
 }
 
-export async function searchEmployees(params: { q: string; page?: number; size?: number }): Promise<{ items: Employee[]; total: number }> {
+export async function searchEmployees(params: { q: string; role?: string; status?: string; page?: number; size?: number }): Promise<{ items: Employee[]; total: number }> {
   const { data } = await http.get<EmployeesResponse>('/api/v1/employees/search', {
     params,
   })
@@ -80,8 +108,11 @@ export async function searchEmployees(params: { q: string; page?: number; size?:
 
 export async function createEmployee(payload: CreateEmployeeRequest): Promise<Employee> {
   try {
-    const { data } = await http.post<Employee>('/api/v1/employees', payload)
-    return data
+    const { data } = await http.post<Employee>('/api/v1/employees', {
+      ...payload,
+      role: toApiRole(payload.role),
+    })
+    return normalizeEmployee(data)
   } catch (error: unknown) {
     handleApiError(error, 'Конфликт при добавлении сотрудника')
   }
@@ -94,9 +125,12 @@ export async function confirmExistingUser(
   try {
     const { data } = await http.post<Employee>(
       `/api/v1/employees/confirm-existing/${userId}`,
-      payload
+      {
+        ...payload,
+        role: toApiRole(payload.role),
+      }
     )
-    return data
+    return normalizeEmployee(data)
   } catch (error: unknown) {
     handleApiError(error, 'Конфликт при подтверждении пользователя')
   }
@@ -112,9 +146,12 @@ export async function takePhoneAndCreate(
   try {
     const { data } = await http.post<Employee>(
       `/api/v1/employees/take-phone-create/${userId}`,
-      payload
+      {
+        ...payload,
+        role: toApiRole(payload.role),
+      }
     )
-    return data
+    return normalizeEmployee(data)
   } catch (error: unknown) {
     handleApiError(error, 'Конфликт при создании сотрудника')
   }
@@ -125,8 +162,12 @@ export async function updateEmployee(
   payload: UpdateEmployeeRequest
 ): Promise<Employee> {
   try {
-    const { data } = await http.patch<Employee>(`/api/v1/employees/${userId}`, payload)
-    return data
+    const sanitized = sanitizeUpdatePayload(payload)
+    const { data } = await http.put<Employee>(`/api/v1/employees/${userId}`, {
+      ...sanitized,
+      role: sanitized.role ? toApiRole(sanitized.role) : undefined,
+    })
+    return normalizeEmployee(data)
   } catch (error: unknown) {
     handleApiError(error, 'Конфликт при обновлении сотрудника')
   }
@@ -137,11 +178,11 @@ export async function updateEmployeePhone(
   payload: UpdatePhoneRequest
 ): Promise<Employee> {
   try {
-    const { data } = await http.patch<Employee>(
+    const { data } = await http.put<Employee>(
       `/api/v1/employees/${userId}/phone`,
       payload
     )
-    return data
+    return normalizeEmployee(data)
   } catch (error: unknown) {
     handleApiError(error, 'Конфликт при обновлении номера телефона')
   }
@@ -163,7 +204,7 @@ export async function toggleEmployeeStatus(
   userId: number,
   active: boolean
 ): Promise<void> {
-  await http.patch(`/api/v1/employees/${userId}/status`, null, {
+  await http.post(`/api/v1/employees/${userId}/status`, null, {
     params: { active },
   })
 }

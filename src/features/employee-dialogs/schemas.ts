@@ -25,7 +25,7 @@ export const createEmployeeSchema = yup.object().shape({
 export const updateEmployeeSchema = yup.object().shape({
   iin: yup.string(),
   email: yup.string().email('\u041d\u0435\u043a\u043e\u0440\u0440\u0435\u043a\u0442\u043d\u044b\u0439 email'),
-  role: yup.string().oneOf(['expert', 'mentor', 'teacher', 'accountant']),
+  role: yup.string().oneOf(['expert', 'mentor', 'teacher', 'accountant', 'head', 'director', 'admin']),
 })
 
 export const updatePhoneSchema = yup.object().shape({

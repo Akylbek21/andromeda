@@ -50,12 +50,13 @@ export function FilterDialog({
           margin="normal"
         >
           <MenuItem value="">Все</MenuItem>
-          <MenuItem value="expert">Expert</MenuItem>
-          <MenuItem value="mentor">Mentor</MenuItem>
-          <MenuItem value="teacher">Teacher</MenuItem>
-          <MenuItem value="accountant">Accountant</MenuItem>
-          <MenuItem value="head">Head</MenuItem>
-          <MenuItem value="director">Director</MenuItem>
+          <MenuItem value="EXPERT">Expert</MenuItem>
+          <MenuItem value="MENTOR">Mentor</MenuItem>
+          <MenuItem value="TEACHER">Teacher</MenuItem>
+          <MenuItem value="ACCOUNTANT">Accountant</MenuItem>
+          <MenuItem value="HEAD">Head</MenuItem>
+          <MenuItem value="DIRECTOR">Director</MenuItem>
+          <MenuItem value="ADMIN">Admin</MenuItem>
         </TextField>
         <TextField
           fullWidth
@@ -66,8 +67,8 @@ export function FilterDialog({
           margin="normal"
         >
           <MenuItem value="">Все</MenuItem>
-          <MenuItem value="active">Активный</MenuItem>
-          <MenuItem value="inactive">Неактивный</MenuItem>
+          <MenuItem value="ACTIVE">Активный</MenuItem>
+          <MenuItem value="INACTIVE">Неактивный</MenuItem>
         </TextField>
       </DialogContent>
       <DialogActions>

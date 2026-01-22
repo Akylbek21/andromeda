@@ -46,11 +46,21 @@ export function AppLayout() {
 
   const handleDrawerToggle = () => setMobileOpen((v) => !v)
 
-  const menuItems = [
-    { label: 'Сотрудники', icon: <PeopleIcon />, path: '/employees' },
-    { label: 'Мои сессии', icon: <EventNoteIcon />, path: '/my-sessions' },
-    { label: 'Все сессии', icon: <ListAltIcon />, path: '/sessions' },
+  const menuItems: Array<{
+    label: string
+    icon: React.ReactNode
+    path: string
+    sectionKey?: keyof NonNullable<typeof user>['sections']
+  }> = [
+    { label: 'Сотрудники', icon: <PeopleIcon />, path: '/employees', sectionKey: 'employees' },
+    { label: 'Мои сессии', icon: <EventNoteIcon />, path: '/my-sessions', sectionKey: 'mySessions' },
+    { label: 'Все сессии', icon: <ListAltIcon />, path: '/sessions', sectionKey: 'admin' },
   ]
+
+  const visibleMenuItems = menuItems.filter((item) => {
+    if (!item.sectionKey) return true
+    return Boolean(user?.sections?.[item.sectionKey])
+  })
 
   const drawer = (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', pt: 3 }}>
@@ -129,7 +139,7 @@ export function AppLayout() {
       {/* Меню */}
       <Box sx={{ flexGrow: 1, overflow: 'auto', px: 1 }}>
         <List>
-          {menuItems.map((item) => (
+          {visibleMenuItems.map((item) => (
             <ListItem key={item.label} disablePadding>
               <ListItemButton
                 onClick={() => {
