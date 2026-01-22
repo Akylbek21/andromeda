@@ -2,7 +2,7 @@ import axios, { AxiosError } from 'axios'
 import type { AxiosInstance, InternalAxiosRequestConfig } from 'axios'
 import { getAccessToken, getRefreshToken, clearTokens, setTokens } from './tokens'
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.andromedaedu.kz'
 
 const http: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
@@ -83,7 +83,7 @@ http.interceptors.response.use(
 
       try {
         const response = await axios.post(
-          `${API_BASE_URL}/api/auth/refresh`,
+          `${API_BASE_URL}/api/v1/auth/refresh`,
           { refreshToken },
           { timeout: 15000 }
         )

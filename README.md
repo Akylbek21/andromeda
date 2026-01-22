@@ -1,4 +1,59 @@
-# React + TypeScript + Vite
+# Andromeda Frontend
+
+React + TypeScript + Vite приложение для системы управления Andromeda.
+
+## Переменные окружения
+
+Приложение использует следующие переменные окружения:
+
+- `VITE_API_BASE_URL` - базовый URL API сервера (по умолчанию: `https://api.andromedaedu.kz`)
+
+### Локальная разработка
+
+Создайте файл `.env.local` в корне проекта:
+
+```env
+VITE_API_BASE_URL=http://localhost:8080
+```
+
+### Production
+
+Для production сборки создайте `.env.production`:
+
+```env
+VITE_API_BASE_URL=https://api.andromedaedu.kz
+```
+
+Или используйте Docker build args (см. раздел Docker).
+
+## Docker
+
+### Сборка и запуск
+
+```bash
+# Сборка и запуск контейнера
+docker compose up -d --build
+
+# Просмотр логов
+docker compose logs -f
+
+# Остановка
+docker compose down
+```
+
+Приложение будет доступно на `http://127.0.0.1:8082`
+
+### Проверка сборки
+
+После сборки можно проверить, что в собранных файлах нет localhost:
+
+```bash
+docker compose exec frontend grep -r "localhost:8080" /usr/share/nginx/html || echo "OK: localhost:8080 не найден"
+```
+
+---
+
+## React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 

@@ -1,6 +1,10 @@
 services:
   frontend:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: "https://api.andromedaedu.kz"
     container_name: andromeda-frontend
     ports:
       - "127.0.0.1:8082:80"
