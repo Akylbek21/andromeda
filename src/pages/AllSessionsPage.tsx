@@ -86,14 +86,12 @@ export function AllSessionsPage() {
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
       <Box>
         <Typography
-          variant="h4"
+          variant="h1"
           sx={{
-            fontWeight: 800,
-            mb: 1,
-            background: 'linear-gradient(135deg, #F54264 0%, #F96741 45%, #FC8C1E 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
+            fontWeight: 700,
+            mb: 2,
+            color: '#0F172A',
+            fontSize: '2rem',
           }}
         >
           Все сессии пользователя

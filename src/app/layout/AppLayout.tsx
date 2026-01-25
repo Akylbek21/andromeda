@@ -223,38 +223,6 @@ export function AppLayout() {
     >
       <CssBaseline />
 
-      <AppBar 
-        position="fixed" 
-        sx={{ 
-          zIndex: (t) => t.zIndex.drawer + 1, 
-          left: { md: DRAWER_WIDTH },
-          backgroundColor: 'rgba(255, 255, 255, 0.8)',
-          backdropFilter: 'blur(12px)',
-          borderBottom: '1px solid',
-          borderColor: 'divider',
-        }}
-      >
-        <Toolbar
-          sx={{
-            minHeight: APPBAR_HEIGHT,
-            px: 3,
-            display: 'flex',
-            alignItems: 'center',
-          }}
-        >
-          {isMobile && (
-            <IconButton
-              color="inherit"
-              edge="start"
-              onClick={handleDrawerToggle}
-              sx={{ mr: 2 }}
-            >
-              <MenuIcon />
-            </IconButton>
-          )}
-        </Toolbar>
-      </AppBar>
-
       <Box component="nav" sx={{ width: { md: DRAWER_WIDTH }, flexShrink: { md: 0 } }}>
         {isMobile ? (
           <Drawer
@@ -291,7 +259,6 @@ export function AppLayout() {
           width: { md: `calc(100% - ${DRAWER_WIDTH}px)` },
         }}
       >
-        <Toolbar sx={{ minHeight: APPBAR_HEIGHT }} />
         <Outlet />
       </Box>
     </Box>
