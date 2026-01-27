@@ -214,11 +214,19 @@ export function AppLayout() {
       sx={{
         display: 'flex',
         minHeight: '100vh',
+        backgroundColor: 'background.default',
         position: 'relative',
-        backgroundImage: 'url(/а.png)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed',
+        overflow: 'hidden',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          inset: 0,
+          background:
+            `radial-gradient(900px 500px at 10% 10%, rgba(37,99,235,.18), transparent 60%),
+             radial-gradient(900px 500px at 90% 15%, rgba(34,211,238,.14), transparent 60%),
+             radial-gradient(900px 500px at 60% 90%, rgba(167,139,250,.14), transparent 60%)`,
+          pointerEvents: 'none',
+        },
       }}
     >
       <CssBaseline />

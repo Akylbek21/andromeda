@@ -141,6 +141,16 @@ const theme = createTheme({
           },
           transition: 'all 0.2s ease',
         },
+        containedPrimary: {
+          backgroundColor: '#2563EB',
+          boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)',
+          '&:hover': {
+            backgroundColor: '#1D4ED8',
+            boxShadow: '0 8px 20px rgba(37, 99, 235, 0.3)',
+            transform: 'translateY(-1px)',
+          },
+          transition: 'all 0.2s ease',
+        },
         outlined: {
           borderWidth: '1px',
           borderColor: '#E2E8F0',
@@ -173,7 +183,9 @@ const theme = createTheme({
       styleOverrides: {
         paper: {
           borderRight: '1px solid #E2E8F0',
-          backgroundColor: '#FFFFFF',
+          background:
+            'linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(248,250,252,0.92) 100%)',
+          backdropFilter: 'blur(10px)',
           boxShadow: '0 0 24px rgba(15, 23, 42, 0.08)',
         },
       },
@@ -232,12 +244,26 @@ const theme = createTheme({
           margin: '4px 12px',
           padding: '12px 16px',
           transition: 'all 0.2s ease',
+          position: 'relative',
           '&.Mui-selected': {
-            backgroundColor: '#EFF6FF',
+            background: 'linear-gradient(135deg, rgba(37,99,235,0.12) 0%, rgba(59,130,246,0.08) 100%)',
             color: '#1D4ED8',
             fontWeight: 600,
+            boxShadow: '0 2px 8px rgba(37, 99, 235, 0.15)',
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              left: 0,
+              top: '50%',
+              transform: 'translateY(-50%)',
+              width: '4px',
+              height: '60%',
+              borderRadius: '0 4px 4px 0',
+              backgroundColor: '#2563EB',
+            },
             '&:hover': {
-              backgroundColor: '#DBEAFE',
+              background: 'linear-gradient(135deg, rgba(37,99,235,0.16) 0%, rgba(59,130,246,0.12) 100%)',
+              boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)',
             },
             '& .MuiListItemIcon-root': {
               color: '#2563EB',

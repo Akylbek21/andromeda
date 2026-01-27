@@ -52,11 +52,7 @@ type EmployeesResponse = {
 } | Employee[]
 
 const normalizeEmployee = (employee: Employee): Employee => {
-  return {
-    ...employee,
-    status: employee.status?.toLowerCase() as Employee['status'],
-    role: employee.role?.toLowerCase() as Employee['role'],
-  }
+  return employee
 }
 
 const toApiRole = (role?: string) => (role ? role.toUpperCase() : role)

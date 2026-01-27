@@ -17,6 +17,7 @@ import {
   MenuItem,
   TableContainer,
   TablePagination,
+  Chip,
 } from '@mui/material'
 import {
   Add as AddIcon,
@@ -120,7 +121,7 @@ export default function EmployeesPage() {
 
   const handleToggleStatus = async () => {
     if (menuEmployee) {
-      const newActiveStatus = menuEmployee.status !== 'active'
+      const newActiveStatus = menuEmployee.status !== 'ACTIVE'
       await toggleEmployeeStatus(menuEmployee.userId, newActiveStatus)
       refetch()
     }
@@ -201,18 +202,6 @@ export default function EmployeesPage() {
             startIcon={<AddIcon />}
             onClick={() => setCreateDialogOpen(true)}
             size="large"
-            sx={{
-              whiteSpace: 'nowrap',
-              px: 3.5,
-              py: 1.5,
-              borderRadius: '8px',
-              background: 'linear-gradient(135deg, #F54264 0%, #F96741 45%, #FC8C1E 100%)',
-              boxShadow: '0 4px 12px rgba(245, 66, 100, 0.3)',
-              '&:hover': {
-                background: 'linear-gradient(135deg, #E03252 0%, #E85830 45%, #E67A17 100%)',
-                boxShadow: '0 8px 20px rgba(245, 66, 100, 0.4)',
-              },
-            }}
           >
             Добавить
           </Button>
@@ -268,8 +257,8 @@ export default function EmployeesPage() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {sortedItems.map((employee, index) => (
-                  <TableRow key={index} hover>
+                {sortedItems.map((employee) => (
+                  <TableRow key={employee.userId} hover>
                     <TableCell>{employee.userId}</TableCell>
                     <TableCell>{employee.lastName}</TableCell>
                     <TableCell>{employee.firstName}</TableCell>
@@ -277,7 +266,11 @@ export default function EmployeesPage() {
                     <TableCell>{employee.iin}</TableCell>
                     <TableCell>{employee.role}</TableCell>
                     <TableCell>
-                      {employee.status === 'active' ? 'Активен' : 'Неактивен'}
+                      <Chip
+                        size="small"
+                        label={employee.status === 'ACTIVE' ? 'Активен' : employee.status === 'INACTIVE' ? 'Неактивен' : `Unknown: ${employee.status}`}
+                        color={employee.status === 'ACTIVE' ? 'success' : employee.status === 'INACTIVE' ? 'error' : 'default'}
+                      />
                     </TableCell>
                     <TableCell align="right">
                       <IconButton
@@ -303,7 +296,7 @@ export default function EmployeesPage() {
           <MenuItem onClick={handleEdit}>Редактировать</MenuItem>
           <MenuItem onClick={handleEditPhone}>Редактировать номер</MenuItem>
           <MenuItem onClick={handleToggleStatus}>
-            {menuEmployee?.status === 'active' ? 'Деактивировать' : 'Активировать'}
+            {menuEmployee?.status === 'ACTIVE' ? 'Деактивировать' : 'Активировать'}
           </MenuItem>
           {isDirector && (
             <MenuItem onClick={handleMakeHead}>Назначить руководителем</MenuItem>

@@ -1,5 +1,5 @@
-export type EmployeeRole = 'expert' | 'mentor' | 'teacher' | 'accountant' | 'head' | 'director' | 'admin'
-export type EmployeeStatus = 'active' | 'inactive'
+export type EmployeeRole = 'EXPERT' | 'MENTOR' | 'TEACHER' | 'ACCOUNTANT' | 'HEAD' | 'DIRECTOR' | 'ADMIN'
+export type EmployeeStatus = 'ACTIVE' | 'INACTIVE'
 
 export type ConflictType = 'USER_EXISTS' | 'EMPLOYEE_EXISTS'
 

@@ -57,15 +57,28 @@ export function CodePage() {
   }
 
   return (
-    <Container maxWidth="sm">
-      <Box
-        sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
+    <Box
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'background.default',
+        position: 'relative',
+        overflow: 'hidden',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          inset: 0,
+          background:
+            `radial-gradient(900px 500px at 10% 10%, rgba(37,99,235,.18), transparent 60%),
+             radial-gradient(900px 500px at 90% 15%, rgba(34,211,238,.14), transparent 60%),
+             radial-gradient(900px 500px at 60% 90%, rgba(167,139,250,.14), transparent 60%)`,
+          pointerEvents: 'none',
+        },
+      }}
+    >
+      <Container maxWidth="sm" sx={{ position: 'relative', zIndex: 1 }}>
         <Paper
           elevation={3}
           sx={{
@@ -142,7 +155,7 @@ export function CodePage() {
             </Box>
           </form>
         </Paper>
-      </Box>
-    </Container>
+      </Container>
+    </Box>
   )
 }

@@ -124,18 +124,6 @@ export function AllSessionsPage() {
             onClick={() => void fetchSessions()}
             disabled={!userId.trim() || loading}
             size="large"
-            sx={{
-              whiteSpace: 'nowrap',
-              px: 3.5,
-              py: 1.5,
-              borderRadius: '8px',
-              background: 'linear-gradient(135deg, #F54264 0%, #F96741 45%, #FC8C1E 100%)',
-              boxShadow: '0 4px 12px rgba(245, 66, 100, 0.3)',
-              '&:hover': {
-                background: 'linear-gradient(135deg, #E03252 0%, #E85830 45%, #E67A17 100%)',
-                boxShadow: '0 8px 20px rgba(245, 66, 100, 0.4)',
-              },
-            }}
           >
             Загрузить
           </Button>

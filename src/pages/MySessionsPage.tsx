@@ -126,16 +126,9 @@ export function MySessionsPage() {
           </Button>
           <Button
             variant="contained"
-            color="error"
             onClick={() => void handleDeleteOthers()}
             disabled={loading || sessions.length === 0}
             size="large"
-            sx={{
-              whiteSpace: 'nowrap',
-              px: 3.5,
-              py: 1.5,
-              borderRadius: '8px',
-            }}
           >
             Завершить все кроме текущей
           </Button>

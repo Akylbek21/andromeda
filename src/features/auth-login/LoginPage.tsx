@@ -41,14 +41,22 @@ export function LoginPage() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundImage: 'url(/а.png)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        backgroundAttachment: 'fixed',
+        backgroundColor: 'background.default',
+        position: 'relative',
+        overflow: 'hidden',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          inset: 0,
+          background:
+            `radial-gradient(900px 500px at 10% 10%, rgba(37,99,235,.18), transparent 60%),
+             radial-gradient(900px 500px at 90% 15%, rgba(34,211,238,.14), transparent 60%),
+             radial-gradient(900px 500px at 60% 90%, rgba(167,139,250,.14), transparent 60%)`,
+          pointerEvents: 'none',
+        },
       }}
     >
-      <Container maxWidth="sm">
+      <Container maxWidth="sm" sx={{ position: 'relative', zIndex: 1 }}>
         <Paper
           elevation={3}
           sx={{
