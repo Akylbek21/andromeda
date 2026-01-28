@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import {
-  AppBar,
   Box,
   CssBaseline,
   Drawer,
@@ -11,7 +10,6 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Toolbar,
   useMediaQuery,
   useTheme,
   Dialog,
@@ -22,7 +20,6 @@ import {
   Button,
 } from '@mui/material'
 import {
-  Menu as MenuIcon,
   People as PeopleIcon,
   Logout as LogoutIcon,
   EventNote as EventNoteIcon,
@@ -33,7 +30,6 @@ import logo from '../../assets/yadro.png'
 import { useAuthStore } from '../../entities/auth'
 
 const DRAWER_WIDTH = 280
-const APPBAR_HEIGHT = 72
 
 export function AppLayout() {
   const theme = useTheme()
